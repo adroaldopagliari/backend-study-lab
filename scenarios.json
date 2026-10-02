@@ -1,0 +1,300 @@
+{
+  "worker-contention": {
+    "title": "More workers, less throughput",
+    "evidence": [
+      {
+        "id": "E1",
+        "text": "At 20 workers: 20 useful jobs/second and 1 second mean service time.",
+        "environment": "synthetic learning fixture"
+      },
+      {
+        "id": "E2",
+        "text": "At 40 workers: 13.3 useful jobs/second and 3 seconds mean service time.",
+        "environment": "synthetic learning fixture"
+      },
+      {
+        "id": "E3",
+        "text": "Database wait time rises; worker CPU remains below saturation.",
+        "environment": "synthetic learning fixture"
+      }
+    ],
+    "baseline": {
+      "mode": "read_only",
+      "observations": [
+        {
+          "statement": "At 20 workers: 20 useful jobs/second and 1 second mean service time.",
+          "evidence_ids": [
+            "E1"
+          ]
+        },
+        {
+          "statement": "At 40 workers: 13.3 useful jobs/second and 3 seconds mean service time.",
+          "evidence_ids": [
+            "E2"
+          ]
+        },
+        {
+          "statement": "Database wait time rises; worker CPU remains below saturation.",
+          "evidence_ids": [
+            "E3"
+          ]
+        }
+      ],
+      "hypotheses": [
+        "Shared database contention may extend service time.",
+        "Retries or a changing document mix may also affect useful throughput."
+      ],
+      "experiment": {
+        "action": "Hold the document mix fixed and reduce concurrency in small steps.",
+        "measurements": [
+          "Useful completions/second",
+          "Database waits",
+          "Oldest pending job age",
+          "Retry rate"
+        ],
+        "rollback_condition": "Abort if oldest pending job age exceeds the predefined SLA threshold."
+      },
+      "uncertainty": [
+        "No query-level trace or fixed-workload comparison is available."
+      ],
+      "exercise": "Choose an initial action. Which two measurements would distinguish contention from retry amplification? What result would reverse your decision?",
+      "rubric": [
+        {
+          "label": "Use observed evidence",
+          "terms": [
+            "e1",
+            "e2",
+            "e3",
+            "20",
+            "40",
+            "13.3"
+          ]
+        },
+        {
+          "label": "Investigate a dependency",
+          "terms": [
+            "database",
+            "connection",
+            "wait",
+            "contention"
+          ]
+        },
+        {
+          "label": "Propose a bounded experiment",
+          "terms": [
+            "reduce",
+            "bound",
+            "limit",
+            "step",
+            "fixed"
+          ]
+        },
+        {
+          "label": "Define a reversal or rollback",
+          "terms": [
+            "rollback",
+            "abort",
+            "reverse",
+            "threshold",
+            "sla"
+          ]
+        }
+      ]
+    }
+  },
+  "retry-amplification": {
+    "title": "Retries hide useful progress",
+    "evidence": [
+      {
+        "id": "E1",
+        "text": "Attempt rate rises after an external processing service begins timing out.",
+        "environment": "synthetic learning fixture"
+      },
+      {
+        "id": "E2",
+        "text": "Unique completed jobs fall while redelivered messages increase.",
+        "environment": "synthetic learning fixture"
+      },
+      {
+        "id": "E3",
+        "text": "The current retry loop immediately resubmits failed requests.",
+        "environment": "synthetic learning fixture"
+      }
+    ],
+    "baseline": {
+      "mode": "read_only",
+      "observations": [
+        {
+          "statement": "Attempt rate rises after an external processing service begins timing out.",
+          "evidence_ids": [
+            "E1"
+          ]
+        },
+        {
+          "statement": "Unique completed jobs fall while redelivered messages increase.",
+          "evidence_ids": [
+            "E2"
+          ]
+        },
+        {
+          "statement": "The current retry loop immediately resubmits failed requests.",
+          "evidence_ids": [
+            "E3"
+          ]
+        }
+      ],
+      "hypotheses": [
+        "Immediate retries may amplify dependency overload.",
+        "A subset of permanently invalid inputs may be consuming attempts."
+      ],
+      "experiment": {
+        "action": "Separate transient failures from invalid input; test bounded delayed retries with jitter.",
+        "measurements": [
+          "Unique completed jobs",
+          "Attempts per logical job",
+          "Dependency latency",
+          "Dead-letter count"
+        ],
+        "rollback_condition": "Pause the experiment if unique completion rate falls or the oldest pending job breaches its time budget."
+      },
+      "uncertainty": [
+        "The failure distribution and downstream capacity limit are unknown."
+      ],
+      "exercise": "Explain why an increasing attempt rate can coexist with declining throughput. What must be idempotent before retrying?",
+      "rubric": [
+        {
+          "label": "Distinguish attempts from work",
+          "terms": [
+            "unique",
+            "logical",
+            "attempt",
+            "duplicate"
+          ]
+        },
+        {
+          "label": "Inspect failure type",
+          "terms": [
+            "transient",
+            "permanent",
+            "invalid",
+            "timeout"
+          ]
+        },
+        {
+          "label": "Bound retries",
+          "terms": [
+            "backoff",
+            "jitter",
+            "delay",
+            "limit"
+          ]
+        },
+        {
+          "label": "Prevent duplicate effects",
+          "terms": [
+            "idempot",
+            "dedup",
+            "stable key"
+          ]
+        }
+      ]
+    }
+  },
+  "reporting-freshness": {
+    "title": "Fast but stale reporting",
+    "evidence": [
+      {
+        "id": "E1",
+        "text": "An analytical dashboard responds in 200 ms in this fixture.",
+        "environment": "synthetic learning fixture"
+      },
+      {
+        "id": "E2",
+        "text": "A recently updated assessment does not appear for 15 minutes.",
+        "environment": "synthetic learning fixture"
+      },
+      {
+        "id": "E3",
+        "text": "The operational database already contains the update.",
+        "environment": "synthetic learning fixture"
+      }
+    ],
+    "baseline": {
+      "mode": "read_only",
+      "observations": [
+        {
+          "statement": "An analytical dashboard responds in 200 ms in this fixture.",
+          "evidence_ids": [
+            "E1"
+          ]
+        },
+        {
+          "statement": "A recently updated assessment does not appear for 15 minutes.",
+          "evidence_ids": [
+            "E2"
+          ]
+        },
+        {
+          "statement": "The operational database already contains the update.",
+          "evidence_ids": [
+            "E3"
+          ]
+        }
+      ],
+      "hypotheses": [
+        "Processing lag may violate the product freshness requirement.",
+        "A cached response or mismatched filters may conceal a fresh record."
+      ],
+      "experiment": {
+        "action": "Compare source timestamps, processing watermarks, and cache state for the same assessment.",
+        "measurements": [
+          "Data age",
+          "Processing lag",
+          "Cache age",
+          "Result correctness"
+        ],
+        "rollback_condition": "Do not accept a latency improvement that breaches the agreed freshness budget."
+      },
+      "uncertainty": [
+        "The acceptable freshness target and cache configuration are unspecified."
+      ],
+      "exercise": "Which requirement is missing? How would you distinguish processing lag from a stale cache before changing databases?",
+      "rubric": [
+        {
+          "label": "Define freshness",
+          "terms": [
+            "fresh",
+            "stale",
+            "age",
+            "15"
+          ]
+        },
+        {
+          "label": "Compare evidence across stores",
+          "terms": [
+            "timestamp",
+            "watermark",
+            "source",
+            "operational"
+          ]
+        },
+        {
+          "label": "Test another hypothesis",
+          "terms": [
+            "cache",
+            "filter"
+          ]
+        },
+        {
+          "label": "Protect correctness",
+          "terms": [
+            "correct",
+            "budget",
+            "requirement",
+            "sla"
+          ]
+        }
+      ]
+    }
+  }
+}

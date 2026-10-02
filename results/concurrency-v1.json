@@ -1,0 +1,111 @@
+{
+  "kind": "synthetic discrete-event simulation",
+  "model_version": 1,
+  "runtime": "3.12.14",
+  "parameters": {
+    "jobs": 2000,
+    "base_service_ms": 100,
+    "dependency_capacity": 8,
+    "contention_penalty_ms": 2,
+    "arrivals": "entire batch at time zero"
+  },
+  "service_time_rule": "100 + 2 * max(0, active_jobs_at_start - 8)^2 milliseconds",
+  "limitations": [
+    "Contention is assumed, not discovered.",
+    "Service time is fixed at job start; later concurrency changes do not alter it.",
+    "No real threads, database, network, retries, CPU or cloud costs are measured.",
+    "p95 service time excludes waiting in the batch queue."
+  ],
+  "contention": [
+    {
+      "workers": 1,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 200.0,
+      "useful_jobs_per_second": 10.0,
+      "p95_service_ms": 100.0
+    },
+    {
+      "workers": 4,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 50.0,
+      "useful_jobs_per_second": 40.0,
+      "p95_service_ms": 100.0
+    },
+    {
+      "workers": 8,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 25.0,
+      "useful_jobs_per_second": 80.0,
+      "p95_service_ms": 100.0
+    },
+    {
+      "workers": 16,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 28.5,
+      "useful_jobs_per_second": 70.175,
+      "p95_service_ms": 228.0
+    },
+    {
+      "workers": 32,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 77.852,
+      "useful_jobs_per_second": 25.69,
+      "p95_service_ms": 1252.0
+    }
+  ],
+  "no_contention_control": [
+    {
+      "workers": 1,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 200.0,
+      "useful_jobs_per_second": 10.0,
+      "p95_service_ms": 100.0
+    },
+    {
+      "workers": 4,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 50.0,
+      "useful_jobs_per_second": 40.0,
+      "p95_service_ms": 100.0
+    },
+    {
+      "workers": 8,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 25.0,
+      "useful_jobs_per_second": 80.0,
+      "p95_service_ms": 100.0
+    },
+    {
+      "workers": 16,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 12.5,
+      "useful_jobs_per_second": 160.0,
+      "p95_service_ms": 100.0
+    },
+    {
+      "workers": 32,
+      "inflight_limit": null,
+      "completed": 2000,
+      "simulated_seconds": 6.3,
+      "useful_jobs_per_second": 317.46,
+      "p95_service_ms": 100.0
+    }
+  ],
+  "bounded_control": {
+    "workers": 32,
+    "inflight_limit": 8,
+    "completed": 2000,
+    "simulated_seconds": 25.0,
+    "useful_jobs_per_second": 80.0,
+    "p95_service_ms": 100.0
+  }
+}
